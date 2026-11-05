@@ -13,3 +13,6 @@ TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | tr -s ' ' 
 DATE=$(date "+%Y-%m-%d")
 HEURE=$(date "+%H:%M")
 LIGNE_FORMATEE="${DATE} - ${HEURE} - ${VILLE}: ${TEMP_ACTUELLE} - ${TEMP_LENDEMAIN}"
+
+# V1.4 : enregistrement, une ligne par exécution ajoutée à la fin de meteo.txt
+echo "$LIGNE_FORMATEE" >> meteo.txt
