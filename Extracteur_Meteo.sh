@@ -1,6 +1,11 @@
 #!/bin/bash
 
 VILLE=$1
+if [ -z "$1" ]; then
+    VILLE="Toulouse"
+else
+    VILLE="$1"
+fi
 
 # Téléchargement au format texte brut sans codes de couleur (?T)
 curl -s "wttr.in/${VILLE}?T" > meteo_brute.txt
