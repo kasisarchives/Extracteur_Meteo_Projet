@@ -40,6 +40,15 @@ if [ "$CODE_CURL" -ne 0 ]; then
     exit "$CODE_CURL"
 fi
 
+# Variante 3 (complément) : wttr.in peut répondre sans erreur HTTP mais sans météo
+# (service saturé, message d'information...) : sans ligne "°C", on journalise et on s'arrête.
+if ! grep -q "°C" meteo_brute.txt; then
+    MESSAGE="[$(date '+%Y-%m-%d %H:%M:%S')] Réponse inattendue de wttr.in pour $VILLE : $(head -n 1 meteo_brute.txt)"
+    echo "$MESSAGE" >> meteo_error.log
+    echo "$MESSAGE" >&2
+    exit 3
+fi
+
 # Motif d'une température wttr.in : "+9(8) °C", "13 °C" ou "-1(-5) °C" (ressenti entre parenthèses)
 REGEX_TEMP='[-+]?[0-9]+([(][-+]?[0-9]+[)])? °C'
 # 1re ligne contenant °C = conditions actuelles

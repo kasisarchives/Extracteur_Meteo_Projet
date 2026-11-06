@@ -114,6 +114,15 @@ Avec cron, relevé toutes les heures archivé par jour :
 
 Si le téléchargement météo échoue, le script écrit une erreur datée dans
 `meteo_error.log` avec la ville demandée, puis s’arrête sans ajouter de relevé.
+Le script s'arrête aussi, avec une erreur datée dans le journal, si wttr.in répond sans
+erreur mais sans données météo (service saturé, message d'information) : aucune ligne
+incomplète n'est alors écrite dans `meteo.txt`.
+
+| Cas détecté | Code de sortie |
+|---|---|
+| Échec de connexion, délai dépassé, ville inconnue (erreur HTTP) | code de `curl` |
+| Réponse reçue mais sans température | 3 |
+
 Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 
 ## Fichiers générés
@@ -123,6 +132,7 @@ Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 | `meteo_brute.txt` | dernière réponse brute de wttr.in |
 | `meteo.txt` | un relevé par ligne |
 | `meteo_AAAAMMJJ.txt` | relevés du jour (option `-a`) |
+| `meteo_error.log` | erreurs horodatées (variante 3) |
 
 ## Versions
 
@@ -131,3 +141,4 @@ Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 | `v1.0` | Script de base : récupération, extraction, formatage, enregistrement |
 | `v2.0` | Ville par défaut + exécution périodique avec cron |
 | `v3.0` | Historique : archivage quotidien (`-a`) |
+| `v4.0` | Variante 3 : gestion des erreurs et journal `meteo_error.log` |
