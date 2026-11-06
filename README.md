@@ -32,6 +32,7 @@ Chaque exécution ajoute une ligne à `meteo.txt` :
 ```
 
 Format : `[Date] - [Heure] - Ville : [Température actuelle] - [Prévision du lendemain]`
+(complété par le vent, l'humidité et la visibilité depuis la variante 1)
 
 ## Fonctionnement
 
@@ -110,6 +111,22 @@ Avec cron, relevé toutes les heures archivé par jour :
 0 * * * * /Users/etudiant/Extracteur_Meteo_Projet/Extracteur_Meteo.sh -a Toulouse >/dev/null 2>&1
 ```
 
+## Variante 1 — Informations supplémentaires
+
+Chaque ligne contient aussi la vitesse du vent, le taux d'humidité et la visibilité :
+
+```
+2026-11-06 - 14:30 - Toulouse : 11°C - 13°C - Vent : 8 km/h - Humidité : 70% - Visibilité : 10 km
+```
+
+| Information | Méthode |
+|---|---|
+| Vent | 1er motif `xx km/h` du bloc des conditions actuelles (`grep -oE`) |
+| Visibilité | motif `xx km` en fin de ligne (le `$` exclut les `km/h`) |
+| Humidité | absente de l'affichage texte standard : requête texte `wttr.in/<Ville>?format=%h` |
+
+Si une information n'est pas disponible, `N/A` est écrit à sa place.
+
 ## Variante 3 — Gestion des erreurs
 
 Si le téléchargement météo échoue, le script écrit une erreur datée dans
@@ -131,6 +148,7 @@ Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 |---|---|
 | `meteo_brute.txt` | dernière réponse brute de wttr.in |
 | `meteo.txt` | un relevé par ligne |
+| `meteo_humidite_brute.txt` | réponse texte brute pour l'humidité (variante 1) |
 | `meteo_AAAAMMJJ.txt` | relevés du jour (option `-a`) |
 | `meteo_error.log` | erreurs horodatées (variante 3) |
 
@@ -142,3 +160,4 @@ Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 | `v2.0` | Ville par défaut + exécution périodique avec cron |
 | `v3.0` | Historique : archivage quotidien (`-a`) |
 | `v4.0` | Variante 3 : gestion des erreurs et journal `meteo_error.log` |
+| `v5.0` | Variante 1 : vent, humidité et visibilité |
