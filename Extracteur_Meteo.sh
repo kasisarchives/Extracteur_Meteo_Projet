@@ -9,11 +9,12 @@ fi
 # Téléchargement au format texte brut sans codes de couleur (?T)
 curl -s "wttr.in/${VILLE}?T" > meteo_brute.txt
 
-REGEX_TEMP='[-+]?[0-9]+\+?(\(([-+]?[0-9]+\+)?\))?\ °C'
-
-TEMP_ACTUELLE=$(grep "°C" meteo_brute.txt | head -n 1 | cut -d '°' -f 1 | xargs | tr ' ' '\n' | tail -n 1)°C
-TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | cut -d '°' -f 1 | xargs | tr ' ' '\n' | tail -n 1)°C
-
+# Motif d'une température wttr.in : "+9(8) °C", "13 °C" ou "-1(-5) °C" (ressenti entre parenthèses)
+REGEX_TEMP='[-+]?[0-9]+([(][-+]?[0-9]+[)])? °C'
+# 1re ligne contenant °C = conditions actuelles
+TEMP_ACTUELLE=$(grep "°C" meteo_brute.txt | head -n 1 | grep -oE "$REGEX_TEMP" | head -n 1 | cut -d '(' -f 1 | cut -d ' ' -f 1 | tr -d '+')°C
+# 3e ligne contenant °C = tableau du lendemain (Matin | Midi | Soir | Nuit) : on garde Midi
+TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | grep -oE "$REGEX_TEMP" | head -n 2 | tail -n 1 | cut -d '(' -f 1 | cut -d ' ' -f 1 | tr -d '+')°C
 
 DATE=$(date "+%Y-%m-%d")
 HEURE=$(date "+%H:%M")
