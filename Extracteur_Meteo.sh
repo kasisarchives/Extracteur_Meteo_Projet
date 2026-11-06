@@ -1,6 +1,5 @@
 #!/bin/bash
 
-VILLE=$1
 if [ -z "$1" ]; then
     VILLE="Toulouse"
 else
