@@ -6,10 +6,24 @@ if [[ "$0" == */* ]]; then
     cd "${0%/*}" || exit 1
 fi
 
-if [ -z "$1" ]; then
-  VILLE="Toulouse"
-else
-  VILLE="$1"
+# V3 : lecture des options
+#   -a, --archive : enregistre dans le fichier du jour meteo_AAAAMMJJ.txt
+#   -h, --help    : affiche l'aide
+ARCHIVE=0
+VILLE=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -a|--archive) ARCHIVE=1 ;;
+        -h|--help)    echo "Usage : $0 [-a] [Ville]   (ville par défaut : Toulouse)"; exit 0 ;;
+        -*)           echo "Option inconnue : $1" >&2; echo "Usage : $0 [-a] [Ville]" >&2; exit 1 ;;
+        *)            VILLE="$1" ;;
+    esac
+    shift
+done
+
+# V2.1 : ville par défaut si aucune ville n'est fournie
+if [ -z "$VILLE" ]; then
+    VILLE="Toulouse"
 fi
 
 # Téléchargement au format texte brut sans codes de couleur (?T)
@@ -26,5 +40,12 @@ DATE=$(date "+%Y-%m-%d")
 HEURE=$(date "+%H:%M")
 LIGNE_FORMATEE="${DATE} - ${HEURE} - ${VILLE} : ${TEMP_ACTUELLE} - ${TEMP_LENDEMAIN}"
 
-# V1.4 : enregistrement, une ligne par exécution ajoutée à la fin de meteo.txt
-echo "$LIGNE_FORMATEE" >> meteo.txt
+# V1.4 : enregistrement, une ligne par exécution ajoutée à la fin du fichier
+# V3   : avec -a, on archive dans un fichier différent chaque jour (meteo_AAAAMMJJ.txt)
+if [ $ARCHIVE -eq 1 ]; then
+    FICHIER_SORTIE="meteo_$(date "+%Y%m%d").txt"
+else
+    FICHIER_SORTIE="meteo.txt"
+fi
+echo "$LIGNE_FORMATEE" >> "$FICHIER_SORTIE"
+echo "$LIGNE_FORMATEE  ->  $FICHIER_SORTIE"
