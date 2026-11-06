@@ -91,12 +91,32 @@ Remarques :
   sécurité → Accès complet au disque.
 - Le fichier [`meteo.cron`](meteo.cron) contient des exemples prêts à copier.
 
+## Historique quotidien (version 3)
+
+L'option `-a` (ou `--archive`) enregistre le relevé dans le fichier du jour `meteo_AAAAMMJJ.txt`
+au lieu de `meteo.txt`. Le nom dépend de la date : un nouveau fichier est créé automatiquement chaque
+jour, et chaque exécution du même jour y ajoute sa ligne. On garde ainsi un historique jour par jour,
+utilisable pour des statistiques.
+
+```bash
+./Extracteur_Meteo.sh -a Paris      # -> meteo_20261106.txt
+./Extracteur_Meteo.sh -a            # ville par défaut, fichier du jour
+./Extracteur_Meteo.sh -h            # aide
+```
+
+Avec cron, relevé toutes les heures archivé par jour :
+
+```cron
+0 * * * * /Users/etudiant/Extracteur_Meteo_Projet/Extracteur_Meteo.sh -a Toulouse >/dev/null 2>&1
+```
+
 ## Fichiers générés
 
 | Fichier | Contenu |
 |---|---|
 | `meteo_brute.txt` | dernière réponse brute de wttr.in |
 | `meteo.txt` | un relevé par ligne |
+| `meteo_AAAAMMJJ.txt` | relevés du jour (option `-a`) |
 
 ## Versions
 
@@ -104,3 +124,4 @@ Remarques :
 |---|---|
 | `v1.0` | Script de base : récupération, extraction, formatage, enregistrement |
 | `v2.0` | Ville par défaut + exécution périodique avec cron |
+| `v3.0` | Historique : archivage quotidien (`-a`) |
