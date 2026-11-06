@@ -27,7 +27,16 @@ if [ -z "$VILLE" ]; then
 fi
 
 # Téléchargement au format texte brut sans codes de couleur (?T)
-curl -s "wttr.in/${VILLE}?T" > meteo_brute.txt
+curl --fail --silent --show-error --connect-timeout 10 --max-time 30 \
+    "https://wttr.in/${VILLE// /%20}?T" > meteo_brute.txt
+
+CODE_CURL=$?
+if [ "$CODE_CURL" -ne 0 ]; then
+    MESSAGE="[$(date '+%Y-%m-%d %H:%M:%S')] Échec de la récupération météo pour $VILLE (curl : $CODE_CURL)."
+    echo "$MESSAGE" >> meteo_error.log
+    echo "$MESSAGE" >&2
+    exit "$CODE_CURL"
+fi
 
 # Motif d'une température wttr.in : "+9(8) °C", "13 °C" ou "-1(-5) °C" (ressenti entre parenthèses)
 REGEX_TEMP='[-+]?[0-9]+([(][-+]?[0-9]+[)])? °C'
