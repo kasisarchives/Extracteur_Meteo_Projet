@@ -1,0 +1,15 @@
+# =============================================================================
+#  Exemples de tâches cron pour Extracteur_Meteo.sh
+#  Installation : crontab -e   puis coller une des lignes ci-dessous
+#  Remplacer /chemin/vers/Extracteur_Meteo_Projet par le résultat de : pwd
+#  Format : minute heure jour_du_mois mois jour_de_la_semaine commande
+# =============================================================================
+
+# Tous les jours à 8h00, pour Toulouse
+0 8 * * * /chemin/vers/Extracteur_Meteo_Projet/Extracteur_Meteo.sh Toulouse >/dev/null 2>&1
+
+# Toutes les heures, ville par défaut
+# 0 * * * * /chemin/vers/Extracteur_Meteo_Projet/Extracteur_Meteo.sh >/dev/null 2>&1
+
+# Toutes les 30 minutes pour Paris
+# */30 * * * * /chemin/vers/Extracteur_Meteo_Projet/Extracteur_Meteo.sh Paris >/dev/null 2>&1

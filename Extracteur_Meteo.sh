@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# V2 : cron lance le script depuis le dossier personnel ; on se place dans le
+# dossier du script pour que meteo_brute.txt et meteo.txt soient créés à côté.
+if [[ "$0" == */* ]]; then
+    cd "${0%/*}" || exit 1
+fi
+
 if [ -z "$1" ]; then
   VILLE="Toulouse"
 else
