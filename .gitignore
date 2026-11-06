@@ -1,0 +1,7 @@
+# Données générées par le script (non versionnées)
+meteo.txt
+meteo_*.txt
+meteo*.json
+meteo_error.log
+meteo_brute.txt
+meteo_humidite_brute.txt
