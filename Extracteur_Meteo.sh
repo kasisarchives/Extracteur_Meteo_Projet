@@ -26,11 +26,13 @@ if [ -z "$VILLE" ]; then
     VILLE="Toulouse"
 fi
 
-# Téléchargement au format texte brut sans codes de couleur (?T)
+# Télécharge la météo en texte brut, avec un délai maximal de 30 secondes.
 curl --fail --silent --show-error --connect-timeout 10 --max-time 30 \
     "https://wttr.in/${VILLE// /%20}?T" > meteo_brute.txt
 
+# Récupère le code de retour de curl : 0 signifie que le téléchargement a réussi.
 CODE_CURL=$?
+# En cas d’échec, écrit une erreur datée dans le journal et arrête le script.
 if [ "$CODE_CURL" -ne 0 ]; then
     MESSAGE="[$(date '+%Y-%m-%d %H:%M:%S')] Échec de la récupération météo pour $VILLE (curl : $CODE_CURL)."
     echo "$MESSAGE" >> meteo_error.log
