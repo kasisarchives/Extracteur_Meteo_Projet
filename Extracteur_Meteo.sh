@@ -56,9 +56,27 @@ TEMP_ACTUELLE=$(grep "°C" meteo_brute.txt | head -n 1 | grep -oE "$REGEX_TEMP" 
 # 3e ligne contenant °C = tableau du lendemain (Matin | Midi | Soir | Nuit) : on garde Midi
 TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | grep -oE "$REGEX_TEMP" | head -n 2 | tail -n 1 | cut -d '(' -f 1 | cut -d ' ' -f 1 | tr -d '+')°C
 
+# Variante 1 : informations supplémentaires, lues dans le bloc "conditions actuelles"
+# (7 premières lignes : ciel, température, vent, visibilité, précipitations)
+BLOC_ACTUEL=$(head -n 7 meteo_brute.txt)
+# Vent : premier "xx km/h" (ex : "8 km/h" ou "5-9 km/h")
+VENT=$(echo "$BLOC_ACTUEL" | grep -oE '[0-9]+(-[0-9]+)? km/h' | head -n 1)
+# Visibilité : "xx km" en fin de ligne (le $ exclut les "km/h")
+VISIBILITE=$(echo "$BLOC_ACTUEL" | grep -oE '[0-9]+ km *$' | head -n 1 | cut -d ' ' -f 1,2)
+# Humidité : absente de l'affichage texte standard, on la demande au même service
+# en texte brut (%h = humidité relative, ex : "70%")
+curl --silent --max-time 15 "https://wttr.in/${VILLE// /%20}?format=%h" > meteo_humidite_brute.txt
+HUMIDITE=$(grep -oE '[0-9]+%' meteo_humidite_brute.txt | head -n 1)
+# Valeur N/A si une information n'a pas pu être lue
+VENT=${VENT:-N/A}
+VISIBILITE=${VISIBILITE:-N/A}
+HUMIDITE=${HUMIDITE:-N/A}
+
 DATE=$(date "+%Y-%m-%d")
 HEURE=$(date "+%H:%M")
 LIGNE_FORMATEE="${DATE} - ${HEURE} - ${VILLE} : ${TEMP_ACTUELLE} - ${TEMP_LENDEMAIN}"
+# Variante 1 : la ligne inclut le vent, l'humidité et la visibilité
+LIGNE_FORMATEE="${LIGNE_FORMATEE} - Vent : ${VENT} - Humidité : ${HUMIDITE} - Visibilité : ${VISIBILITE}"
 
 # V1.4 : enregistrement, une ligne par exécution ajoutée à la fin du fichier
 # V3   : avec -a, on archive dans un fichier différent chaque jour (meteo_AAAAMMJJ.txt)
