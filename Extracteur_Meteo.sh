@@ -10,8 +10,10 @@ fi
 curl -s "wttr.in/${VILLE}?T" > meteo_brute.txt
 
 REGEX_TEMP='[-+]?[0-9]+\+?(\(([-+]?[0-9]+\+)?\))?\ °C'
-TEMP_ACTUELLE=$(grep "°C" meteo_brute.txt | head -n 1 | grep -E -o '[-+]?[0-9]+' | head -n 1 | tr -d '+')°C
-TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | grep -E -o "$REGEX_TEMP" | head -n 2 | tail -n 1 | cut -d '(' -f 1 | cut -d ' ' -f 1 | tr -d '+')°C
+
+TEMP_ACTUELLE=$(grep "°C" meteo_brute.txt | head -n 1 | cut -d '°' -f 1 | xargs | tr ' ' '\n' | tail -n 1)°C
+TEMP_LENDEMAIN=$(grep "°C" meteo_brute.txt | head -n 3 | tail -n 1 | cut -d '°' -f 1 | xargs | tr ' ' '\n' | tail -n 1)°C
+
 
 DATE=$(date "+%Y-%m-%d")
 HEURE=$(date "+%H:%M")
