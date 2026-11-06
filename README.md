@@ -110,6 +110,12 @@ Avec cron, relevé toutes les heures archivé par jour :
 0 * * * * /Users/etudiant/Extracteur_Meteo_Projet/Extracteur_Meteo.sh -a Toulouse >/dev/null 2>&1
 ```
 
+## Variante 3 — Gestion des erreurs
+
+Si le téléchargement météo échoue, le script écrit une erreur datée dans
+`meteo_error.log` avec la ville demandée, puis s’arrête sans ajouter de relevé.
+Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
+
 ## Fichiers générés
 
 | Fichier | Contenu |
