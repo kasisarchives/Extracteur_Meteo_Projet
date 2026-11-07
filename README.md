@@ -161,3 +161,29 @@ Pour lire la dernière erreur, utilise `tail -n 1 meteo_error.log`.
 | `v3.0` | Historique : archivage quotidien (`-a`) |
 | `v4.0` | Variante 3 : gestion des erreurs et journal `meteo_error.log` |
 | `v5.0` | Variante 1 : vent, humidité et visibilité |
+
+
+## Description détaillée de notre travail collaboratif
+
+Nous avons adopté un flux de travail collaboratif asynchrone basé sur le gestionnaire de versions Git et la plateforme GitHub. Le développement a été réparti entre les cinq membres du groupe sous forme de relais. Pour garantir la stabilité du code, chaque nouvelle fonctionnalité ou correction a été développée sur des branches isolées (par exemple, `feature/v2-cron-doc` ou `feature/v3-archivage`). 
+
+L'intégration au projet commun s'est faite par des fusions (`merge`) régulières sur la branche principale (`main`). Cette méthode nous a permis de confronter et de résoudre formellement les conflits de fusion, assurant ainsi un historique clair, traçable et un apprentissage concret des outils de collaboration en entreprise.
+
+## Description de notre approche de gestion de projet
+
+Notre gestion de projet s'est articulée autour d'un développement itératif et incrémental, matérialisé par des versions strictes validées par des étiquettes (tags Git : `v1.0`, `v2.0`, `v3.0`). 
+
+Nous avons mis un point d'honneur à respecter rigoureusement le cahier des charges. Face à la contrainte d'interdiction d'outils avancés comme `awk`, `sed` ou les expressions régulières complexes (`grep -E`), nous avons privilégié une approche algorithmique par contournement. La communication au sein du groupe et la vérification du code avant chaque fusion ont permis de maintenir un script robuste face à l'instabilité du formatage ASCII renvoyé par l'API externe.
+
+## Description des solutions implémentées par version
+
+### Version 1 : Extraction de base et parsing
+L'objectif initial était l'extraction fiable des données textuelles. Nous avons utilisé `curl` pour récupérer le bulletin de `wttr.in`. Pour isoler les températures actuelles et celles du lendemain au sein d'un tableau ASCII très instable (espaces variables, caractères de dessin de tableau), nous avons conçu une chaîne de traitement (`pipe`) stricte utilisant `grep`, `head`, `tail`, `tr`, et `cut`. L'utilisation de `xargs` a permis de nettoyer les espaces résiduels, garantissant une écriture propre dans le fichier `meteo.txt`.
+
+### Version 2 : Automatisation et portabilité
+Cette version s'est concentrée sur l'autonomie du script. Nous avons implémenté la gestion d'une ville par défaut (Toulouse) en cas d'absence d'argument. Pour l'automatisation, nous avons documenté et mis en place une exécution planifiée via le démon système `cron`. Techniquement, nous avons ajouté une routine de sécurisation des chemins relatifs dans le script (`cd "${0%/*}"`) afin de garantir que les fichiers de sortie soient toujours générés dans le répertoire du script, indépendamment de l'environnement d'exécution du `cron`.
+
+### Version 3 : Archivage, options et extraction avancée
+La version finale intègre une gestion professionnelle des paramètres via une boucle `while` et un `case`, permettant l'interprétation des options `-a` (archivage) et `-h` (aide). 
+L'option d'archivage génère dynamiquement des fichiers de sortie horodatés (`meteo_AAAAMMJJ.txt`). Les capacités d'extraction ont été étendues au vent, à la visibilité et à l'humidité. Pour extraire ces données en respectant les contraintes de commandes, nous avons utilisé une astuce technique reposant sur l'inversion des chaînes (`rev`) couplée à `cut`, permettant d'isoler la fin des lignes sans être affecté par la longueur variable de la météo affichée au début de la ligne. Enfin, une gestion stricte des erreurs HTTP et des délais d'attente (timeout) a été ajoutée à `curl`, avec journalisation dans un fichier `meteo_error.log`.
+
